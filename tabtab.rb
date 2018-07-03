@@ -1,23 +1,15 @@
-module Tabtab
-  @@prev_c_arr = []
-  def swallow_whitespace str
-    if !(peek_char(str) =~ /\t/)
-      return str
-    end
-    str.shift
-    trampoline { swallow_whitespace(str) }
-    return str
-  end
+
+
 
   def previous_char
     return @@prev_c_arr[-2]
   end
 
-  def peek_char str
-    q = str.shift
-    str.unshift q
-    q
-  end
+    def peek_char str
+      q = str.shift
+      str.unshift q
+      q
+    end
   def get_char str
     q = str.shift
     @@prev_c_arr << q
@@ -33,17 +25,7 @@ module Tabtab
     !
     TABULA
   end
-  def trampoline
-    f = yield
-    loop do
-      case f
-      when Proc
-        f = f[]
-      else
-        break f
-      end
-    end
-  end
+
 
   def build_table(str)
     if void? str then raise "Can't build an empty table" end
@@ -104,7 +86,7 @@ module Tabtab
   end
 
   def add_sc(str, pts)
-#    puts "Inserting small caps..."
+    #    puts "Inserting small caps..."
     prefix_insert(str.chars, pts, '{{sc|', '}}', 0)
   end
   
@@ -114,10 +96,10 @@ module Tabtab
     when String
       arr = arr.chars
     end
-  #  puts "Called, offset is #{offset}"
+    #  puts "Called, offset is #{offset}"
 
     if (points.count.even?)
- #     puts "Even!"
+      #     puts "Even!"
       i = points.shift
       arr.insert(i+offset, obj)
       offset += 1
@@ -125,7 +107,7 @@ module Tabtab
       i = points.shift
       arr.insert(i+offset, obj2)
       offset += 1
-   #   puts "i: #{i}, of: #{offset} -> #{i+offset}"
+      #   puts "i: #{i}, of: #{offset} -> #{i+offset}"
     end
     trampoline { prefix_insert(arr,points, obj, obj2, offset) }
   end
@@ -167,3 +149,5 @@ module Tabtab
   end
 
 end
+
+
