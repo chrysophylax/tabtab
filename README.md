@@ -1,7 +1,8 @@
 # tabtab
 Tabulated tables for MediaWiki markup.
 
-Use as
+## Usage
+A file defined as following is a valid input to Tabtab
 ```
 !
 my-entry	second-entry	third-entry
@@ -17,4 +18,19 @@ This will generate a mediawiki table
 |-
 |match-entry||fifth-entry||sixth-entry
 |}
+```
+
+### To use the included tabtab.rb executable from the shell,
+```bash
+chmod +x tabtab.rb
+./tabtab.rb sample_table.txt
+```
+
+### To call the transformer programmatically,
+```ruby
+require_relative 'lexer'
+
+tabtab = Tabtab::Lexer.new
+result = tabtab.gen_table(indata_string)
+puts result
 ```
