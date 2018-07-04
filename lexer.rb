@@ -38,15 +38,15 @@ module Tabtab
       return @output.to_s
     end
 
-    def get_char(charr)
-      ch = charr.shift
+    def get_char(arr)
+      ch = arr.shift
       @seen << ch
       return ch
     end
     
-    def peek_char(charr)
-      ch = charr.shift
-      charr.unshift(ch)
+    def peek_char(arr)
+      ch = arr.shift
+      arr.unshift(ch)
       return ch
     end
 
@@ -54,27 +54,27 @@ module Tabtab
       return @seen[-2]
     end
 
-    def consume_ws(charr)
-      next_ch = peek_char(charr)
+    def consume_ws(arr)
+      next_ch = peek_char(arr)
       
       if (next_ch != '\t')
-        return charr
+        return arr
       end
-      charr.shift
-      trampoline { consume_ws(charr) }
+      arr.shift
+      trampoline { consume_ws(arr) }
     end
 
     def void?(str)
       if str.nil? | str.empty? then return true end
     end
 
-    def build_table(charr)        
-      ch = get_char(charr)
+    def build_table(arr)        
+      ch = get_char(arr)
       raise "Missing start declaration '!' for table." unless ch == '!'
       raise "Missing end declaration '!' for table." unless
-        charr[-1] == '!'
+        arr[-1] == '!'
 
-      result = build_row(charr)
+      result = build_row(arr)
       return result.to_s
     end
 
@@ -118,23 +118,23 @@ module Tabtab
       end
     end
 
-    def __build_row (charr, acc)
-      if charr == [] then return acc end
+    def __build_row (arr, acc)
+      if arr == [] then return acc end
       if acc == nil then acc = ""  end
 
-      ch = get_char(charr)
+      ch = get_char(arr)
       case ch
       when '!'
-        acc += handle_table_declarator(ch, charr)
+        acc += handle_table_declarator(ch, arr)
       when "\t"
-        acc += handle_row_separator(ch, charr)
+        acc += handle_row_separator(ch, arr)
       when "\n"
-        acc += handle_newline(ch, charr)
+        acc += handle_newline(ch, arr)
       when /\S/i
-        acc += handle_column_data(ch, charr)
+        acc += handle_column_data(ch, arr)
       end
 
-      trampoline { __build_row(charr, acc) }
+      trampoline { __build_row(arr, acc) }
       
     end
   end
