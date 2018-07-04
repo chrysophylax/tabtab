@@ -16,6 +16,12 @@ module Tabtab
       end
     end    
 
+    def gen_table(str)
+      feed(str)
+      invoke
+      to_s
+    end
+
     def initialize
       @seen = []
       @output = []
@@ -127,7 +133,7 @@ module Tabtab
       when '!'
         acc += handle_table_declarator(ch, arr)
       when "\t"
-        acc += handle_row_separator(ch, arr)
+        acc += handle_column_separator(ch, arr)
       when "\n"
         acc += handle_newline(ch, arr)
       when /\S/i
