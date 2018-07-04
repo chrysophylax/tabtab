@@ -1,6 +1,8 @@
 module Tabtab
   class Lexer
     attr_reader :seen, :input, :output, :ir
+      TABLE_START = '{|class="table"'
+      TABLE_END = '|}'
 
     def trampoline
       f = yield
@@ -48,7 +50,7 @@ module Tabtab
       return ch
     end
 
-    def prev_char(charr)
+    def prev_char
       return @seen[-2]
     end
 
@@ -72,8 +74,7 @@ module Tabtab
       raise "Missing end declaration '!' for table." unless
         charr[-1] == '!'
 
-      result = '{|class="table"' + build_row(charr)
-      + "|}"
+      result = build_row(charr)
       return result.to_s
     end
 
@@ -82,28 +83,55 @@ module Tabtab
       row = __build_row(arr, nil)
     end
 
+    def handle_table_declarator(read, arr)
+      # consume the whitespace
+      ch = arr.shift
+      if prev_char == nil
+        #beginning of a table-def
+        #add first-row marker after \n
+        raise "Table declaration missing newline" unless ch =~ /\s/
+        return TABLE_START + "\n|"
+
+      elsif peek_char(arr) == nil
+        #end of a table-def
+        return "\n" + TABLE_END
+      end
+      
+    end
+
+    def handle_column_data(ch, arr)
+      #TODO check for small_caps and other funky functions
+      return ch
+    end
+
+    def handle_column_separator(ch, arr)
+      arr = consume_ws(arr)
+      return "||"
+    end
+
+    def handle_newline(ch, arr)
+      if peek_char(arr) == '!'
+      #skip writin \n at end of table-def
+        ""
+      elsif peek_char(arr) != nil
+        "\n|-\n|"
+      end
+    end
+
     def __build_row (charr, acc)
       if charr == [] then return acc end
-      if acc == nil then acc = "|"  end
+      if acc == nil then acc = ""  end
 
       ch = get_char(charr)
       case ch
       when '!'
-        if peek_char(charr) =~ /\s/
-          acc += '{|class="table"'
-          acc += "\n"
-        elsif peek_char(charr) == nil
-          acc += '|}'
-        end
+        acc += handle_table_declarator(ch, charr)
       when "\t"
-        charr = consume_ws(charr)
-        acc += "||"
+        acc += handle_row_separator(ch, charr)
       when "\n"
-        if peek_char(charr) != nil
-          acc += "\n|-\n|"
-        end
+        acc += handle_newline(ch, charr)
       when /\S/i
-        acc += ch
+        acc += handle_column_data(ch, charr)
       end
 
       trampoline { __build_row(charr, acc) }
