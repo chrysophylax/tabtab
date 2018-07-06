@@ -76,26 +76,29 @@ module Tabtab
     
     def build_row(arr)
       if void? arr then raise "Can't build an empty row" end
-      row = __build_row(arr, nil)
+      row = trampoline { __build_row(arr, "") }
     end
 
     def __build_row (arr, acc)
-      if arr == [] then return acc end
-      if acc == nil then acc = ""  end
-
-      ch = get_char(arr)
-      case ch
-      when '!'
-        acc += handle_table_declarator(ch, arr)
-      when "\t"
-        acc += handle_column_separator(ch, arr)
-      when "\n"
-        acc += handle_newline(ch, arr)
-      when /\S/i
-        acc += handle_column_data(ch, arr)
+      if arr != []
+        -> {
+          
+          ch = get_char(arr)
+          case ch
+          when '!'
+            acc += handle_table_declarator(ch, arr)
+          when "\t"
+            acc += handle_column_separator(ch, arr)
+          when "\n"
+            acc += handle_newline(ch, arr)
+          when /\S/i
+            acc += handle_column_data(ch, arr)
+          end
+          __build_row(arr,acc)
+        }
+      else
+        acc
       end
-
-      trampoline { __build_row(arr, acc) }
       
     end
 
