@@ -66,12 +66,13 @@ module Tabtab
 
     def consume_ws(arr)
       next_ch = peek_char(arr)
-      
       if (next_ch != '\t')
         return arr
       end
-      arr.shift
-      trampoline { consume_ws(arr) }
+      -> {
+        arr.shift
+        consume_ws(arr)
+      }
     end
     
     def build_row(arr)
@@ -124,7 +125,7 @@ module Tabtab
     end
 
     def handle_column_separator(ch, arr)
-      arr = consume_ws(arr)
+      arr = trampoline { consume_ws(arr) }
       return "||"
     end
 
